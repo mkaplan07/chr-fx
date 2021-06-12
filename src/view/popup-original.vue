@@ -1,14 +1,9 @@
 <template>
   <div id="popup">
-    <div v-if="!avKey">
-      <p>Please enter your API key</p>
-      <input type="text" v-model="avKey">
-    </div>
-    <!-- TODO: is "base" the best v-else-if? -->
-    <div v-else-if="base">
-      <p>avKey: {{ avKey }}</p>
-      <button type="button" @click="fetchAV">fetchAV</button>
-      <button type="button" @click="displayChart">Get Daily</button>
+    <button type="button" @click="displayChart">Get Daily</button>
+
+    <!-- TODO: is "base" the best v-if? -->
+    <div v-if="base">
       <p>{{ base }}/{{ quote }}</p>
       <p>{{ exchangeRate }}</p>
       <canvas id="daily-chart"></canvas>
@@ -19,7 +14,6 @@
       </ul> -->
     </div>
     <div v-else>
-      <p>avKey: {{ avKey }}</p>
       <p>Yes, we have no bananas.</p>
     </div>
   </div>
@@ -31,7 +25,6 @@ export default {
   name: 'popup',
   data() {
     return {
-      avKey: '',
       term: '',
       pairs: ['EURUSD', 'EUR/USD', 'USDJPY', 'USD/JPY', 'GBPUSD', 'GBP/USD', 'USDCHF', 'USD/CHF'],
       base: '',
@@ -72,22 +65,24 @@ export default {
         if (this.pairs.includes(this.term)) {
           this.base = this.term.slice(0, 3);
           this.quote = this.term.slice(-3);
+          this.fetchAV(this.base, this.quote);
         }
       });
     },
-    getExchangeRate() {
-      fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${this.base}&to_currency=${this.quote}&apikey=${this.avKey}`)
+    getExchangeRate(base, quote) {
+      fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${base}&to_currency=${quote}&apikey=process.env.KEY`)
         .then(response => response.json())
         .then(data => this.exchangeRate = data.["Realtime Currency Exchange Rate"]["5. Exchange Rate"]);
     },
-    getDaily() {
-      fetch(`https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
+    getDaily(base, quote) {
+      fetch(`https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${base}&to_symbol=${quote}&apikey=process.env.KEY`)
         .then(response => response.json())
         .then(data => {
           this.daily.data.datasets[0].data.length = 0;
           for (let k in data["Time Series FX (Daily)"]) {
             if (this.daily.data.datasets[0].data.length <= 10) {
               this.daily.data.datasets[0].data.push(Number(data["Time Series FX (Daily)"][k]["4. close"]));
+              // this.daily.data.labels.push(data["Time Series FX (Daily)"][k]);
             }
           }
         })
@@ -96,15 +91,11 @@ export default {
       let ctx = document.getElementById('daily-chart');
       new Chart(ctx, this.daily);
     },
-    fetchAV() {
-      this.getExchangeRate();
-      this.getDaily();
-    }
-    /*
-    TODO: save API key to Chrome (1st fx check) & chrome.storage (subsequent)
-    so the user doesn't have to keep entering it
-    + link to Alpha Vantage...
-    */
+    fetchAV(base, quote) {
+      this.getExchangeRate(base, quote);
+      this.getDaily(base, quote);
+    },
+    // TODO: reverse prices? clear data between highlights? clear storage? unique IDs?
   }
 };
 </script>
