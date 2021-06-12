@@ -1,10 +1,11 @@
 <template>
   <div id="popup">
-    <div v-if="!avKey">
+    <p>verified: {{ verified }}</p>
+    <div v-if="!verified">
       <p>Please enter your API key</p>
       <input type="text" v-model="avKey">
+      <button type="button" @click="verifyKey">Submit</button>
     </div>
-    <!-- TODO: is "base" the best v-else-if? -->
     <div v-else-if="base">
       <p>avKey: {{ avKey }}</p>
       <button type="button" @click="fetchAV">fetchAV</button>
@@ -32,6 +33,7 @@ export default {
   data() {
     return {
       avKey: '',
+      verified: false,
       term: '',
       pairs: ['EURUSD', 'EUR/USD', 'USDJPY', 'USD/JPY', 'GBPUSD', 'GBP/USD', 'USDCHF', 'USD/CHF'],
       base: '',
@@ -74,6 +76,12 @@ export default {
           this.quote = this.term.slice(-3);
         }
       });
+    },
+    verifyKey() {
+      // any string 
+      if (this.avKey) {
+        this.verified = true;
+      }
     },
     getExchangeRate() {
       fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${this.base}&to_currency=${this.quote}&apikey=${this.avKey}`)
