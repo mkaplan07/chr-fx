@@ -4,5 +4,5 @@ function getHighlight() {
 
 document.addEventListener('mouseup', () => {
   let text = getHighlight();
-  chrome.storage.local.set({ data: text });
+  chrome.storage.local.set({ selection: text });
 });

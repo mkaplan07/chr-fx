@@ -2,8 +2,12 @@
   <div id="popup">
     <p>verified: {{ verified }}</p>
     <div v-if="!verified">
-      <p>Please enter your API key</p>
-      <input type="text" v-model="avKey">
+      <p>Data provided by Alpha Vantage</p>
+      <p>Get your free API key
+      <a href="https://www.alphavantage.co/support/#api-key" target="_blank">here</a>
+      </p>
+
+      <input type="text" v-model="avKey" placeholder="Enter your API key" style="margin-right: 5px;">
       <button type="button" @click="verifyKey">Submit</button>
     </div>
     <div v-else-if="base">
@@ -23,6 +27,7 @@
       <p>avKey: {{ avKey }}</p>
       <p>Yes, we have no bananas.</p>
     </div>
+    <button type="button" @click="clearStorage" style="margin-top: 10px;">Clear Storage</button>
   </div>
 </template>
 
@@ -65,12 +70,13 @@ export default {
   },
   // https://stackoverflow.com/questions/42260274/load-data-from-chrome-storage-into-vue-js-data
   mounted() {
-    this.getStorage();
+    this.getTerm();
+    this.keyCheck();
   },
   methods: {
-    getStorage() {
-      chrome.storage.local.get('data', result => {
-        this.term = result.data;
+    getTerm() {
+      chrome.storage.local.get('selection', result => {
+        this.term = result.selection;
         if (this.pairs.includes(this.term)) {
           this.base = this.term.slice(0, 3);
           this.quote = this.term.slice(-3);
@@ -78,10 +84,21 @@ export default {
       });
     },
     verifyKey() {
-      // any string 
       if (this.avKey) {
         this.verified = true;
+        chrome.storage.local.set({ key: this.avKey });
       }
+    },
+    keyCheck() {
+      chrome.storage.local.get('key', result => {
+        if (result.key) {
+          this.verified = true;
+          this.avKey = result.key;
+        }
+      });
+    },
+    clearStorage() {
+      chrome.storage.local.clear();
     },
     getExchangeRate() {
       fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${this.base}&to_currency=${this.quote}&apikey=${this.avKey}`)
@@ -98,6 +115,7 @@ export default {
               this.daily.data.datasets[0].data.push(Number(data["Time Series FX (Daily)"][k]["4. close"]));
             }
           }
+          this.daily.data.datasets[0].data.reverse();
         })
     },
     displayChart() {
@@ -108,11 +126,6 @@ export default {
       this.getExchangeRate();
       this.getDaily();
     }
-    /*
-    TODO: save API key to Chrome (1st fx check) & chrome.storage (subsequent)
-    so the user doesn't have to keep entering it
-    + link to Alpha Vantage...
-    */
   }
 };
 </script>
