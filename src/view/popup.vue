@@ -135,7 +135,7 @@ export default {
   mounted() {
     this.getTerm();
     this.keyCheck();
-    this.awaitFetch();
+    this.awaitFetch(); // dependent on getTerm()
   },
   methods: {
     getTerm() {
