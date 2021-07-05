@@ -1,21 +1,30 @@
 <template>
   <div id="popup">
-    <button type="button" @click="displayChart">Get Daily</button>
+    <p>verified: {{ verified }}</p>
+    <div v-if="!verified">
+      <p>Data provided by Alpha Vantage</p>
+      <p>Get your free API key
+      <a href="https://www.alphavantage.co/support/#api-key" target="_blank">here</a>
+      </p>
 
-    <!-- TODO: is "base" the best v-if? -->
-    <div v-if="base">
+      <input type="text" v-model="avKey" placeholder="Enter your API key" style="margin-right: 5px;">
+      <button type="button" @click="verifyKey">Submit</button>
+    </div>
+    <div v-else-if="base">
+      <p>avKey: {{ avKey }}</p>
+      <button type="button" @click="displayChart(this.daily)">Get Daily</button>
+      <button type="button" @click="displayChart(this.weekly)">Get Weekly</button>
       <p>{{ base }}/{{ quote }}</p>
-      <p>{{ exchangeRate }}</p>
-      <canvas id="daily-chart"></canvas>
+      <div v-show="exchangeRate" id="exchangeRate" :class="[this.prev > this.exchangeRate ? 'negative' : 'positive']">{{ exchangeRate }}</div>
+      <canvas id="chart"></canvas>
       <span>base: {{ this.base }}</span><span>, quote: {{ this.quote }}</span>
       <p>daily.data... {{ daily.data.datasets[0].data }}</p>
-      <!-- <ul>
-        <li v-for="close in daily.data.datasets[0].data" :key="close">{{ close }}</li>
-      </ul> -->
     </div>
     <div v-else>
+      <p>avKey: {{ avKey }}</p>
       <p>Yes, we have no bananas.</p>
     </div>
+    <button type="button" @click="clearKey" style="margin-top: 10px;">Clear Key</button>
   </div>
 </template>
 
@@ -25,18 +34,22 @@ export default {
   name: 'popup',
   data() {
     return {
+      avKey: '',
+      verified: false,
       term: '',
       pairs: ['EURUSD', 'EUR/USD', 'USDJPY', 'USD/JPY', 'GBPUSD', 'GBP/USD', 'USDCHF', 'USD/CHF'],
       base: '',
       quote: '',
       exchangeRate: '',
+      prev: '', // to compare w/ exchangeRate
+      view: '',
       daily: {
         type: "line",
         data: {
-          labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          labels: [],
           datasets: [
             {
-              label: "Daily Closes",
+              label: "Close",
               data: [],
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
@@ -47,55 +60,182 @@ export default {
         options: {
           responsive: true,
           lineTension: 1,
-          // legend: {
-          //   display: false
-          // }
+          scales: {
+            xAxes: [{
+              display: false
+            }]
+          },
+          legend: {
+            display: false
+          },
+          tooltips: {
+            displayColors: false
+          }
         }
-      }
+      },
+      // weekly: {
+      //   type: "line",
+      //   data: {
+      //     labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      //     datasets: [
+      //       {
+      //         label: "Close",
+      //         data: [],
+      //         backgroundColor: "rgba(54,73,93,.5)",
+      //         borderColor: "#36495d",
+      //         borderWidth: 3
+      //       }
+      //     ]
+      //   },
+      //   options: {
+      //     responsive: true,
+      //     lineTension: 1,
+      //     scales: {
+      //       xAxes: [{
+      //         display: false
+      //       }]
+      //     },
+      //     legend: {
+      //       display: false,
+      //     },
+      //     tooltips: {
+      //       displayColors: false
+      //     }
+      //   }
+      // },
+      // monthly: {
+      //   type: "line",
+      //   data: {
+      //     labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      //     datasets: [
+      //       {
+      //         label: "Monthly Closes",
+      //         data: [],
+      //         backgroundColor: "rgba(54,73,93,.5)",
+      //         borderColor: "#36495d",
+      //         borderWidth: 3
+      //       }
+      //     ]
+      //   },
+      //   options: {
+      //     responsive: true,
+      //     lineTension: 1,
+      //     scales: {
+      //       xAxes: [{
+      //         display: false
+      //       }]
+      //     }
+      //   }
+      // }
     }
   },
-  // https://stackoverflow.com/questions/42260274/load-data-from-chrome-storage-into-vue-js-data
   mounted() {
-    this.getStorage();
+    this.getTerm();
+    this.keyCheck();
+    this.awaitFetch(); // dependent on getTerm()
   },
   methods: {
-    getStorage() {
-      chrome.storage.local.get('data', result => {
-        this.term = result.data;
+    getTerm() {
+      chrome.storage.local.get('selection', result => {
+        this.term = result.selection;
         if (this.pairs.includes(this.term)) {
           this.base = this.term.slice(0, 3);
           this.quote = this.term.slice(-3);
-          this.fetchAV(this.base, this.quote);
         }
       });
     },
-    getExchangeRate(base, quote) {
-      fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${base}&to_currency=${quote}&apikey=process.env.KEY`)
-        .then(response => response.json())
-        .then(data => this.exchangeRate = data.["Realtime Currency Exchange Rate"]["5. Exchange Rate"]);
+    verifyKey() {
+      if (this.avKey) {
+        this.verified = true;
+        chrome.storage.local.set({ key: this.avKey });
+      }
     },
-    getDaily(base, quote) {
-      fetch(`https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${base}&to_symbol=${quote}&apikey=process.env.KEY`)
+    keyCheck() {
+      chrome.storage.local.get('key', result => {
+        if (result.key) {
+          this.verified = true;
+          this.avKey = result.key;
+        }
+      });
+    },
+    clearKey() {
+      this.avKey = '';
+      chrome.storage.local.set({ key: this.avKey });
+      this.verified = false;
+    },
+    // getExchangeRate() {
+    //   fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${this.base}&to_currency=${this.quote}&apikey=${this.avKey}`)
+    //     .then(response => response.json())
+    //     .then(data => this.exchangeRate = data.["Realtime Currency Exchange Rate"]["5. Exchange Rate"]);
+    //
+    //     let last = this.daily.data.datasets[0].data[this.daily.data.datasets[0].data.length - 1];
+    //     if ((this.exchangeRate - last) / this.exchangeRate > 0) {
+    //       this.positive = true;
+    //     } else if ((this.exchangeRate - last) / this.exchangeRate > 0) {
+    //       this.positive = false;
+    //     }
+    // },
+    getDaily() {
+      fetch(`https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
         .then(response => response.json())
         .then(data => {
           this.daily.data.datasets[0].data.length = 0;
+          this.daily.data.labels.length = 0;
           for (let k in data["Time Series FX (Daily)"]) {
             if (this.daily.data.datasets[0].data.length <= 10) {
-              this.daily.data.datasets[0].data.push(Number(data["Time Series FX (Daily)"][k]["4. close"]));
-              // this.daily.data.labels.push(data["Time Series FX (Daily)"][k]);
+              this.daily.data.datasets[0].data.unshift(Number(data["Time Series FX (Daily)"][k]["4. close"]));
+              this.daily.data.labels.unshift(k);
+            } else {
+              this.exchangeRate = this.daily.data.datasets[0].data.slice(-1).shift();
+              this.prev = this.daily.data.datasets[0].data.slice(-2).shift();
             }
           }
         })
     },
-    displayChart() {
-      let ctx = document.getElementById('daily-chart');
-      new Chart(ctx, this.daily);
+    // getWeekly() {
+    //   fetch(`https://www.alphavantage.co/query?function=FX_WEEKLY&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
+    //     .then(response => response.json())
+    //     .then(data => {
+    //       this.weekly.data.datasets[0].data.length = 0;
+    //       this.weekly.data.labels.length = 0;
+    //       for (let k in data["Time Series FX (Weekly)"]) {
+    //         if (this.weekly.data.datasets[0].data.length <= 10) {
+    //           this.weekly.data.datasets[0].data.unshift(Number(data["Time Series FX (Weekly)"][k]["4. close"]));
+    //           this.weekly.data.labels.unshift(k);
+    //         }
+    //       }
+    //     })
+    // },
+    // getMonthly() {
+    //   fetch(`https://www.alphavantage.co/query?function=FX_MONTHLY&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
+    //     .then(response => response.json())
+    //     .then(data => {
+    //       this.monthly.data.datasets[0].data.length = 0;
+    //       this.monthly.data.labels.length = 0;
+    //       for (let k in data["Time Series FX (Monthly)"]) {
+    //         if (this.monthly.data.datasets[0].data.length <= 10) {
+    //           this.monthly.data.datasets[0].data.unshift(Number(data["Time Series FX (Monthly)"][k]["4. close"]));
+    //           this.monthly.data.labels.unshift(k);
+    //         }
+    //       }
+    //     })
+    // },
+    displayChart(timeframe) {
+      if (this.view) {
+        this.view.destroy();
+      }
+      let ctx = document.getElementById('chart');
+      this.view = new Chart(ctx, timeframe);
     },
-    fetchAV(base, quote) {
-      this.getExchangeRate(base, quote);
-      this.getDaily(base, quote);
-    },
-    // TODO: reverse prices? clear data between highlights? clear storage? unique IDs?
+    awaitFetch() {
+      if (!this.base) {
+        setTimeout(() => {
+          this.awaitFetch();
+        }, 500);
+      } else {
+        this.getDaily();
+      }
+    }
   }
 };
 </script>
@@ -103,5 +243,18 @@ export default {
 <style>
 #popup {
   width: 300px;
+  font-family: Helvetica;
+}
+#exchangeRate {
+  width: 100%;
+  text-align: center;
+
+  font-size: 20px;
+}
+.positive {
+  color: green;
+}
+.negative {
+  color: red;
 }
 </style>
