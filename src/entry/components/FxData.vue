@@ -1,17 +1,21 @@
 <template>
-  <div id="buttons">
+  <!-- <div id="buttons">
     <button type="button" @click="displayChart(this.daily)">Get Daily</button>
     <button type="button" @click="displayChart(this.weekly)">Get Weekly</button>
     <button type="button" @click="displayChart(this.monthly)">Get Monthly</button>
-  </div>
+  </div> -->
 
   <p>{{ base }}/{{ quote }}</p>
-  <!-- <div v-show="exchangeRate" id="exchangeRate" :class="[this.prev > this.exchangeRate ? 'negative' : 'positive']">{{ exchangeRate }}</div>
-  <canvas id="chart"></canvas>
+  <!-- <div v-if="exchangeRate" id="exchangeRate" :class="[this.prev > this.exchangeRate ? 'negative' : 'positive']">{{ exchangeRate }}</div> -->
+  <div id="exchangeRate">{{ exchangeRate }}</div>
+  <p>current is... {{ current }}</p>
+  <canvas v-show="current === 'daily'" id="daily" @click="displayNext('weekly')"></canvas>
+  <canvas v-show="current === 'weekly'" id="weekly" @click="displayNext('monthly')"></canvas>
+  <canvas v-show="current === 'monthly'" id="monthly" @click="displayNext('daily')"></canvas>
 
-  <p>daily.data {{ daily.data.datasets[0].data }}</p>
-  <p>weekly.data {{ weekly.data.datasets[0].data }}</p>
-  <p>monthly.data {{ monthly.data.datasets[0].data }}</p> -->
+  <p>daily: {{ daily.data.datasets[0].data }}</p>
+  <p>weekly: {{ weekly.data.datasets[0].data }}</p>
+  <p>monthly: {{ monthly.data.datasets[0].data }}</p>
 </template>
 
 <script>
@@ -22,16 +26,16 @@ export default {
   data() {
     return {
       exchangeRate: '',
-      prev: '', // get exchangeRate color
+      // prev: '', // get exchangeRate color
       view: '',
-      msg: '',
+      current: '',
+      count: 0,
       daily: {
         type: "line",
         data: {
           labels: [],
           datasets: [
             {
-              label: "Close",
               data: [],
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
@@ -61,7 +65,6 @@ export default {
           labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
           datasets: [
             {
-              label: "Close",
               data: [],
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
@@ -91,7 +94,6 @@ export default {
           labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
           datasets: [
             {
-              label: "Monthly Closes",
               data: [],
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
@@ -117,15 +119,9 @@ export default {
       }
     }
   },
-  // mounted() {
-  //   this.getDailyData();
-  //   // this.postMessage();
-  // },
-  // watch: {
-  //   quote() {
-  //     this.getDailyData();
-  //   }
-  // },
+  mounted() {
+    this.getChartData();
+  },
   methods: {
     getData(timeframe) {
       fetch(`https://www.alphavantage.co/query?function=FX_${timeframe.toUpperCase()}&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
@@ -139,44 +135,42 @@ export default {
               this[timeframe].data.labels.unshift(k);
             } else if (timeframe === 'daily') {
               this.exchangeRate = this.daily.data.datasets[0].data.slice(-1).shift();
-              this.prev = this.daily.data.datasets[0].data.slice(-2).shift();
+              // this.prev = this.daily.data.datasets[0].data.slice(-2).shift();
             }
           }
         })
+        .then(() => {
+          this.count += 1;
+        })
     },
-    displayChart(dataset) {
-      if (this.view) {
-        this.view.destroy();
-      }
+    displayNext(timeframe) {
+      this.current = timeframe;
+    },
+    createChart(id, dataset) {
+      // if (this.view) { this.view.destroy(); }
 
-      let ctx = document.getElementById('chart');
+      let ctx = document.getElementById(id);
       this.view = new Chart(ctx, dataset);
     },
-    // displayData() {
-    //   if (!this.prev) { // last step in getData()
-    //     setTimeout(() => {
-    //       this.displayData();
-    //     }, 500);
-    //   } else {
-    //     this.displayChart(this.daily);
-    //     this.getData('weekly');
-    //     this.getData('monthly');
-    //   }
-    // },
-    // getDailyData() {
-    //   if (!this.quote) { // prop
-    //     setTimeout(() => {
-    //       this.getDailyData();
-    //     }, 500);
-    //   } else {
-    //     this.getData('daily');
-    //     this.displayData();
-    //   }
-    // }
-    getDailyData() {
+    prepCharts() {
+      if (this.count < 3) { // all datasets loaded
+        setTimeout(() => {
+          this.prepCharts();
+        }, 500);
+      } else {
+        this.createChart('daily', this.daily);
+        this.createChart('weekly', this.weekly);
+        this.createChart('monthly', this.monthly);
+
+        this.current = 'daily';
+      }
+    },
+    getChartData() {
       this.getData('daily');
-      this.displayChart(this.daily);
-      // this.displayData();
+      this.getData('weekly');
+      this.getData('monthly');
+
+      this.prepCharts();
     }
   }
 }
