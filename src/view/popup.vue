@@ -10,11 +10,12 @@
       <input type="text" v-model="avKey" placeholder="Enter your API key" style="margin-right: 5px;">
       <button type="button" @click="verifyKey">Submit</button>
     </div>
-    <div v-else-if="base">
-      <p>avKey: {{ avKey }}</p>
-      <button type="button" @click="displayChart(this.daily)">Get Daily</button>
-      <button type="button" @click="displayChart(this.weekly)">Get Weekly</button>
-      <button type="button" @click="displayChart(this.monthly)">Get Monthly</button>
+    <div v-else-if="quote">
+      <div id="buttons">
+        <button type="button" @click="displayChart(this.daily)">Get Daily</button>
+        <button type="button" @click="displayChart(this.weekly)">Get Weekly</button>
+        <button type="button" @click="displayChart(this.monthly)">Get Monthly</button>
+      </div>
 
       <p>{{ base }}/{{ quote }}</p>
       <div v-show="exchangeRate" id="exchangeRate" :class="[this.prev > this.exchangeRate ? 'negative' : 'positive']">{{ exchangeRate }}</div>
@@ -26,7 +27,6 @@
       <p>monthly.data {{ monthly.data.datasets[0].data }}</p>
     </div>
     <div v-else>
-      <p>avKey: {{ avKey }}</p>
       <p>Yes, we have no bananas.</p>
     </div>
     <button type="button" @click="clearKey" style="margin-top: 10px;">Clear Key</button>
@@ -143,23 +143,16 @@ export default {
   mounted() {
     this.getTerm();
     this.keyCheck();
-    this.awaitFetch(); // dependent on getTerm()
+    this.getDailyData(); // dependent on getTerm()
   },
   methods: {
     getTerm() {
       chrome.storage.local.get('selection', result => {
-        this.term = result.selection;
-        if (this.pairs.includes(this.term)) {
-          this.base = this.term.slice(0, 3);
-          this.quote = this.term.slice(-3);
+        if (this.pairs.includes(result.selection)) {
+          this.base = result.selection.slice(0, 3);
+          this.quote = result.selection.slice(-3);
         }
       });
-    },
-    verifyKey() {
-      if (this.avKey) {
-        this.verified = true;
-        chrome.storage.local.set({ key: this.avKey });
-      }
     },
     keyCheck() {
       chrome.storage.local.get('key', result => {
@@ -173,6 +166,12 @@ export default {
       this.avKey = '';
       chrome.storage.local.set({ key: this.avKey });
       this.verified = false;
+    },
+    verifyKey() {
+      if (this.avKey) {
+        this.verified = true;
+        chrome.storage.local.set({ key: this.avKey });
+      }
     },
     getData(timeframe) {
       fetch(`https://www.alphavantage.co/query?function=FX_${timeframe.toUpperCase()}&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
@@ -195,22 +194,33 @@ export default {
       if (this.view) {
         this.view.destroy();
       }
+
       let ctx = document.getElementById('chart');
       this.view = new Chart(ctx, dataset);
     },
-    awaitFetch() {
-      if (!this.base) {
+    displayData() {
+      if (!this.prev) { // last step in getData()
         setTimeout(() => {
-          this.awaitFetch();
+          this.displayData();
         }, 500);
       } else {
-        this.getData('daily');
+        this.displayChart(this.daily);
         this.getData('weekly');
         this.getData('monthly');
       }
+    },
+    getDailyData() {
+      if (!this.quote) { // last step in getTerm()
+        setTimeout(() => {
+          this.getDailyData();
+        }, 500);
+      } else {
+        this.getData('daily');
+        this.displayData();
+      }
     }
   }
-};
+}
 </script>
 
 <style>
@@ -218,10 +228,13 @@ export default {
   width: 300px;
   font-family: Helvetica;
 }
+#buttons {
+  text-align: center;
+}
 #exchangeRate {
   width: 100%;
   margin-bottom: 10px;
-  
+
   text-align: center;
 
   font-size: 20px;
