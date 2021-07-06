@@ -1,18 +1,14 @@
 <template>
-  <!-- <div id="buttons">
-    <button type="button" @click="displayChart(this.daily)">Get Daily</button>
-    <button type="button" @click="displayChart(this.weekly)">Get Weekly</button>
-    <button type="button" @click="displayChart(this.monthly)">Get Monthly</button>
-  </div> -->
-
   <p>{{ base }}/{{ quote }}</p>
-  <!-- <div v-if="exchangeRate" id="exchangeRate" :class="[this.prev > this.exchangeRate ? 'negative' : 'positive']">{{ exchangeRate }}</div> -->
-  <div id="exchangeRate">{{ exchangeRate }}</div>
+  <div id="exchangeRate" :class="upDown">{{ exchangeRate }}</div>
+  <!-- TODO: v-if="exchangeRate" ? -->
+
   <p>current is... {{ current }}</p>
   <canvas v-show="current === 'daily'" id="daily" @click="displayNext('weekly')"></canvas>
   <canvas v-show="current === 'weekly'" id="weekly" @click="displayNext('monthly')"></canvas>
   <canvas v-show="current === 'monthly'" id="monthly" @click="displayNext('daily')"></canvas>
 
+  <!-- for testing only -->
   <p>daily: {{ daily.data.datasets[0].data }}</p>
   <p>weekly: {{ weekly.data.datasets[0].data }}</p>
   <p>monthly: {{ monthly.data.datasets[0].data }}</p>
@@ -26,10 +22,9 @@ export default {
   data() {
     return {
       exchangeRate: '',
-      // prev: '', // get exchangeRate color
       view: '',
-      current: '',
-      count: 0,
+      current: '', // daily, weekly, monthly
+      count: 0, // all datasets loaded
       daily: {
         type: "line",
         data: {
@@ -122,6 +117,12 @@ export default {
   mounted() {
     this.getChartData();
   },
+  computed: { // https://vuejs.org/v2/guide/class-and-style.html
+    upDown() {
+      let prev = this.daily.data.datasets[0].data.slice(-2).shift();
+      return this.exchangeRate > prev ? 'positive' : 'negative';
+    }
+  },
   methods: {
     getData(timeframe) {
       fetch(`https://www.alphavantage.co/query?function=FX_${timeframe.toUpperCase()}&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
@@ -135,11 +136,10 @@ export default {
               this[timeframe].data.labels.unshift(k);
             } else if (timeframe === 'daily') {
               this.exchangeRate = this.daily.data.datasets[0].data.slice(-1).shift();
-              // this.prev = this.daily.data.datasets[0].data.slice(-2).shift();
             }
           }
         })
-        .then(() => {
+        .then(() => { // TODO: is .then necessary?
           this.count += 1;
         })
     },
