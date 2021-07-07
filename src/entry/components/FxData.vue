@@ -1,9 +1,10 @@
 <template>
+  <!-- TODO: style base/quote -->
   <p>{{ base }}/{{ quote }}</p>
-  <div id="exchangeRate" :class="upDown">{{ exchangeRate }}</div>
-  <!-- TODO: v-if="exchangeRate" ? -->
 
-  <p>current is... {{ current }}</p>
+  <!-- TODO: v-if="exchangeRate" ? -->
+  <div id="exchangeRate" :class="upDown">{{ exchangeRate }}</div>
+
   <canvas v-show="current === 'daily'" id="daily" @click="displayNext('weekly')"></canvas>
   <canvas v-show="current === 'weekly'" id="weekly" @click="displayNext('monthly')"></canvas>
   <canvas v-show="current === 'monthly'" id="monthly" @click="displayNext('daily')"></canvas>

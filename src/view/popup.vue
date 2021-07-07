@@ -1,21 +1,25 @@
 <template>
   <div id="popup">
+    <!-- for testing only -->
     <p>verified: {{ verified }}</p>
+
     <div v-if="!verified">
       <p>Data provided by Alpha Vantage</p>
       <p>Get your free API key
       <a href="https://www.alphavantage.co/support/#api-key" target="_blank">here</a>
       </p>
 
-      <input type="text" v-model="avKey" placeholder="Enter your API key" style="margin-right: 5px;">
-      <button type="button" @click="verifyKey">Submit</button>
+      <input type="text" :class="validate" v-model="avKey" placeholder="Enter your API key">
+      <button type="button" id="submit" @click="verifyKey">Submit</button>
     </div>
 
     <fx-data v-else-if="quote" :base="base" :quote="quote"></fx-data>
 
     <div v-else>
-      <p>Yes, we have no bananas.</p>
+      <p>Highlight a forex currency pair and try again.</p>
     </div>
+
+    <!-- for testing only -->
     <button type="button" @click="clearKey" style="margin-top: 10px;">Clear Key</button>
   </div>
 </template>
@@ -31,8 +35,7 @@ export default {
   data() {
     return {
       avKey: '',
-      verified: false,
-      term: '',
+      verified: null,
       pairs: ['EURUSD', 'EUR/USD', 'USDJPY', 'USD/JPY', 'GBPUSD', 'GBP/USD', 'USDCHF', 'USD/CHF'],
       base: '',
       quote: ''
@@ -41,6 +44,11 @@ export default {
   mounted() {
     this.getTerm();
     this.keyCheck();
+  },
+  computed: {
+    validate() {
+      return this.verified === false ? 'rejectKey' : 'acceptKey';
+    }
   },
   methods: {
     getTerm() {
@@ -62,12 +70,14 @@ export default {
     clearKey() {
       this.avKey = '';
       chrome.storage.local.set({ key: this.avKey });
-      this.verified = false;
+      this.verified = null;
     },
     verifyKey() {
       if (this.avKey) {
         this.verified = true;
         chrome.storage.local.set({ key: this.avKey });
+      } else {
+        this.verified = false; // see computed, validate()
       }
     }
   }
@@ -78,5 +88,16 @@ export default {
 #popup {
   width: 300px;
   font-family: Helvetica;
+}
+.acceptKey {
+  outline: none;
+  border: 1px solid #c7c7c7;
+}
+.rejectKey {
+  outline: none;
+  border: 1px solid red;
+}
+#submit {
+  margin-left: 5px;
 }
 </style>
