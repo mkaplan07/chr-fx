@@ -1,28 +1,22 @@
 <template>
-  <!-- TODO: style base/quote -->
-  <p>{{ base }}/{{ quote }}</p>
-
-  <div v-if="exchangeRate" id="priceInfo">
-    <!-- TODO: style exchangeRate -->
+  <!-- error & count for testing only -->
+  <p>error: {{ error }}</p>
+  <p>count: {{ count }}</p>
+  <div v-show="exchangeRate" id="priceInfo">
     <div id="exchangeRate">{{ exchangeRate }}</div>
 
     <span v-if="whichArrow" class="positive">&#8593;</span>
     <span v-else class="negative">&#8595;</span>
   </div>
 
-  <div v-show="current === 'daily'">
-    <p>{{ base }}/{{ quote }} Daily</p>
-    <canvas id="daily" @click="displayNext"></canvas>
-  </div>
+  <p v-show="current === 'daily'">{{ base }}/{{ quote }} Daily</p>
+  <canvas v-show="current === 'daily'" id="daily" @click="displayNext('monthly')"></canvas>
 
-  <div v-show="current === 'monthly'">
-    <p>{{ base }}/{{ quote }} Monthly</p>
-    <canvas id="monthly" @click="displayNext"></canvas>
-  </div>
+  <p v-show="current === 'monthly'">{{ base }}/{{ quote }} Monthly</p>
+  <canvas v-show="current === 'monthly'" id="monthly" @click="displayNext('daily')"></canvas>
 
-  <!-- for testing only -->
-  <p>daily: {{ daily.data.datasets[0].data }}</p>
-  <p>monthly: {{ monthly.data.datasets[0].data }}</p>
+  <!-- <p>daily: {{ daily.data.datasets[0].data }}</p>
+  <p>monthly: {{ monthly.data.datasets[0].data }}</p> -->
 </template>
 
 <script>
@@ -35,6 +29,7 @@ export default {
       exchangeRate: '',
       current: '',
       count: 0,
+      error: false,
       daily: {
         type: "line",
         data: {
@@ -122,12 +117,8 @@ export default {
         })
         .then(() => this.count += 1)
     },
-    displayNext() {
-      if (this.current === 'daily') {
-        this.current = 'monthly';
-      } else {
-        this.current = 'daily';
-      }
+    displayNext(timeframe) {
+      this.current = timeframe;
     },
     createChart(id, dataset) {
       // if (this.view) { this.view.destroy(); }
@@ -136,15 +127,25 @@ export default {
       new Chart(ctx, dataset);
     },
     prepCharts() {
-      if (this.count < 2) { // both datasets
+      if (this.count < 2) {
         setTimeout(() => {
           this.prepCharts();
         }, 500);
       } else {
-        this.createChart('daily', this.daily);
-        this.current = 'daily';
+        // TODO: outsource to fn
+        if (this.daily.data.datasets[0].data.length) {
+          this.createChart('daily', this.daily);
+        } else {
+          this.error = true;
+        }
 
-        this.createChart('monthly', this.monthly);
+        if (this.monthly.data.datasets[0].data.length) {
+          this.createChart('monthly', this.monthly);
+        } else {
+          this.error = true;
+        }
+
+        this.current = 'daily';
       }
     },
     getChartData() {
@@ -168,11 +169,27 @@ export default {
 #exchangeRate {
   font-size: 20px;
   margin-right: 1px;
+
+  animation: fadein 1s;
 }
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 .positive {
   color: green;
+  animation: up 0.75s;
 }
+@keyframes up {
+  50% {transform: translateY(5px);}
+}
+
 .negative {
   color: red;
+  animation: down 0.75s;
+}
+@keyframes down {
+  50% {transform: translateY(-5px);}
 }
 </style>
