@@ -6,9 +6,8 @@
     <!-- TODO: style exchangeRate -->
     <div id="exchangeRate">{{ exchangeRate }}</div>
 
-    <!-- TODO: get better arrows -->
-    <img class="arrow" v-if="whichArrow" src="../../assets/up-arrow.png"/>
-    <img class="arrow" v-else src="../../assets/down-arrow.png"/>
+    <span v-if="whichArrow" class="positive">&#8593;</span>
+    <span v-else class="negative">&#8595;</span>
   </div>
 
   <div v-show="current === 'daily'">
@@ -100,10 +99,6 @@ export default {
     this.getChartData();
   },
   computed: {
-    // upDown() {
-    //   let prev = this.daily.data.datasets[0].data.slice(-2).shift();
-    //   return this.exchangeRate > prev ? 'positive' : 'negative';
-    // },
     whichArrow() {
       let prev = this.daily.data.datasets[0].data.slice(-2).shift();
       return this.exchangeRate > prev;
@@ -166,21 +161,18 @@ export default {
 #priceInfo {
   display: flex;
   justify-content: center;
+  align-items: center;
+
+  font-size: 16px;
 }
 #exchangeRate {
-  margin-bottom: 10px;
-
   font-size: 20px;
+  margin-right: 1px;
 }
 .positive {
   color: green;
 }
 .negative {
   color: red;
-}
-.arrow {
-  width: 15px;
-  height: 15px;
-  margin: 4px;
 }
 </style>
