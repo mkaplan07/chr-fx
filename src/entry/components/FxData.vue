@@ -23,15 +23,15 @@ export default {
   data() {
     return {
       exchangeRate: '',
-      view: '',
       current: '', // daily, weekly, monthly
-      count: 0, // all datasets loaded
+      count: 0,
       daily: {
         type: "line",
         data: {
           labels: [],
           datasets: [
             {
+              label: `${this.base}/${this.quote} Daily`,
               data: [],
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
@@ -48,7 +48,9 @@ export default {
             }]
           },
           legend: {
-            display: false
+            labels: {
+              boxWidth: 0,
+            }
           },
           tooltips: {
             displayColors: false
@@ -61,6 +63,7 @@ export default {
           labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
           datasets: [
             {
+              label: `${this.base}/${this.quote} Weekly`,
               data: [],
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
@@ -77,7 +80,9 @@ export default {
             }]
           },
           legend: {
-            display: false,
+            labels: {
+              boxWidth: 0,
+            }
           },
           tooltips: {
             displayColors: false
@@ -90,6 +95,7 @@ export default {
           labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
           datasets: [
             {
+              label: `${this.base}/${this.quote} Monthly`,
               data: [],
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
@@ -106,7 +112,9 @@ export default {
             }]
           },
           legend: {
-            display: false,
+            labels: {
+              boxWidth: 0,
+            }
           },
           tooltips: {
             displayColors: false
@@ -118,7 +126,7 @@ export default {
   mounted() {
     this.getChartData();
   },
-  computed: { // https://vuejs.org/v2/guide/class-and-style.html
+  computed: {
     upDown() {
       let prev = this.daily.data.datasets[0].data.slice(-2).shift();
       return this.exchangeRate > prev ? 'positive' : 'negative';
@@ -140,9 +148,7 @@ export default {
             }
           }
         })
-        .then(() => { // TODO: is .then necessary?
-          this.count += 1;
-        })
+        .then(() => this.count += 1)
     },
     displayNext(timeframe) {
       this.current = timeframe;
@@ -151,7 +157,7 @@ export default {
       // if (this.view) { this.view.destroy(); }
 
       let ctx = document.getElementById(id);
-      this.view = new Chart(ctx, dataset);
+      new Chart(ctx, dataset);
     },
     prepCharts() {
       if (this.count < 3) { // all datasets loaded

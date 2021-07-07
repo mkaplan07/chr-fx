@@ -36,7 +36,9 @@ export default {
     return {
       avKey: '',
       verified: null,
-      pairs: ['EURUSD', 'EUR/USD', 'USDJPY', 'USD/JPY', 'GBPUSD', 'GBP/USD', 'USDCHF', 'USD/CHF'],
+      pairs: ['EURUSD', 'EUR/USD', 'USDJPY', 'USD/JPY', 'GBPUSD',
+      'GBP/USD', 'USDCHF', 'USD/CHF', 'USDCAD', 'USD/CAD',
+      'AUDUSD', 'AUD/USD', 'NZDUSD', 'NZD/USD'],
       base: '',
       quote: ''
     }
