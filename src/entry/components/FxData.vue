@@ -2,8 +2,14 @@
   <!-- TODO: style base/quote -->
   <p>{{ base }}/{{ quote }}</p>
 
-  <!-- TODO: v-if="exchangeRate" ? -->
-  <div id="exchangeRate" :class="upDown">{{ exchangeRate }}</div>
+  <div v-if="exchangeRate" id="priceInfo">
+    <!-- TODO: style exchangeRate -->
+    <div id="exchangeRate">{{ exchangeRate }}</div>
+
+    <!-- TODO: get better arrows -->
+    <img class="arrow" v-if="whichArrow" src="../../assets/up-arrow.png"/>
+    <img class="arrow" v-else src="../../assets/down-arrow.png"/>
+  </div>
 
   <canvas v-show="current === 'daily'" id="daily" @click="displayNext('weekly')"></canvas>
   <canvas v-show="current === 'weekly'" id="weekly" @click="displayNext('monthly')"></canvas>
@@ -127,9 +133,13 @@ export default {
     this.getChartData();
   },
   computed: {
-    upDown() {
+    // upDown() {
+    //   let prev = this.daily.data.datasets[0].data.slice(-2).shift();
+    //   return this.exchangeRate > prev ? 'positive' : 'negative';
+    // },
+    whichArrow() {
       let prev = this.daily.data.datasets[0].data.slice(-2).shift();
-      return this.exchangeRate > prev ? 'positive' : 'negative';
+      return this.exchangeRate > prev;
     }
   },
   methods: {
@@ -184,14 +194,12 @@ export default {
 </script>
 
 <style scoped>
-#buttons {
-  text-align: center;
+#priceInfo {
+  display: flex;
+  justify-content: center;
 }
 #exchangeRate {
-  width: 100%;
   margin-bottom: 10px;
-
-  text-align: center;
 
   font-size: 20px;
 }
@@ -200,5 +208,10 @@ export default {
 }
 .negative {
   color: red;
+}
+.arrow {
+  width: 15px;
+  height: 15px;
+  margin: 4px;
 }
 </style>
