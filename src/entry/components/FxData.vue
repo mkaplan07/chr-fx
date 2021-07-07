@@ -11,13 +11,18 @@
     <img class="arrow" v-else src="../../assets/down-arrow.png"/>
   </div>
 
-  <canvas v-show="current === 'daily'" id="daily" @click="displayNext('weekly')"></canvas>
-  <canvas v-show="current === 'weekly'" id="weekly" @click="displayNext('monthly')"></canvas>
-  <canvas v-show="current === 'monthly'" id="monthly" @click="displayNext('daily')"></canvas>
+  <div v-show="current === 'daily'">
+    <p>{{ base }}/{{ quote }} Daily</p>
+    <canvas id="daily" @click="displayNext"></canvas>
+  </div>
+
+  <div v-show="current === 'monthly'">
+    <p>{{ base }}/{{ quote }} Monthly</p>
+    <canvas id="monthly" @click="displayNext"></canvas>
+  </div>
 
   <!-- for testing only -->
   <p>daily: {{ daily.data.datasets[0].data }}</p>
-  <p>weekly: {{ weekly.data.datasets[0].data }}</p>
   <p>monthly: {{ monthly.data.datasets[0].data }}</p>
 </template>
 
@@ -29,7 +34,7 @@ export default {
   data() {
     return {
       exchangeRate: '',
-      current: '', // daily, weekly, monthly
+      current: '',
       count: 0,
       daily: {
         type: "line",
@@ -37,7 +42,6 @@ export default {
           labels: [],
           datasets: [
             {
-              label: `${this.base}/${this.quote} Daily`,
               data: [],
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
@@ -54,41 +58,7 @@ export default {
             }]
           },
           legend: {
-            labels: {
-              boxWidth: 0,
-            }
-          },
-          tooltips: {
-            displayColors: false
-          }
-        }
-      },
-      weekly: {
-        type: "line",
-        data: {
-          labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-          datasets: [
-            {
-              label: `${this.base}/${this.quote} Weekly`,
-              data: [],
-              backgroundColor: "rgba(54,73,93,.5)",
-              borderColor: "#36495d",
-              borderWidth: 3
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          lineTension: 1,
-          scales: {
-            xAxes: [{
-              display: false
-            }]
-          },
-          legend: {
-            labels: {
-              boxWidth: 0,
-            }
+            display: false,
           },
           tooltips: {
             displayColors: false
@@ -98,10 +68,9 @@ export default {
       monthly: {
         type: "line",
         data: {
-          labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          labels: [],
           datasets: [
             {
-              label: `${this.base}/${this.quote} Monthly`,
               data: [],
               backgroundColor: "rgba(54,73,93,.5)",
               borderColor: "#36495d",
@@ -118,9 +87,7 @@ export default {
             }]
           },
           legend: {
-            labels: {
-              boxWidth: 0,
-            }
+            display: false,
           },
           tooltips: {
             displayColors: false
@@ -160,8 +127,12 @@ export default {
         })
         .then(() => this.count += 1)
     },
-    displayNext(timeframe) {
-      this.current = timeframe;
+    displayNext() {
+      if (this.current === 'daily') {
+        this.current = 'monthly';
+      } else {
+        this.current = 'daily';
+      }
     },
     createChart(id, dataset) {
       // if (this.view) { this.view.destroy(); }
@@ -170,21 +141,19 @@ export default {
       new Chart(ctx, dataset);
     },
     prepCharts() {
-      if (this.count < 3) { // all datasets loaded
+      if (this.count < 2) { // both datasets
         setTimeout(() => {
           this.prepCharts();
         }, 500);
       } else {
         this.createChart('daily', this.daily);
-        this.createChart('weekly', this.weekly);
-        this.createChart('monthly', this.monthly);
-
         this.current = 'daily';
+
+        this.createChart('monthly', this.monthly);
       }
     },
     getChartData() {
       this.getData('daily');
-      this.getData('weekly');
       this.getData('monthly');
 
       this.prepCharts();
