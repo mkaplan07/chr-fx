@@ -102,7 +102,7 @@ export default {
   },
   methods: {
     getData(timeframe) {
-      fetch(`https://www.alphavontage.co/query?function=FX_${timeframe.toUpperCase()}&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
+      fetch(`https://www.alphavantage.co/query?function=FX_${timeframe.toUpperCase()}&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
         .then(response => response.json())
         .then(data => {
           this[timeframe].data.datasets[0].data.length = 0;
@@ -169,7 +169,7 @@ export default {
   font-size: 20px;
   margin-right: 1px;
 
-  animation: fadein 1s;
+  animation: fadein 0.75s;
 }
 @keyframes fadein {
   from { opacity: 0; }
@@ -178,17 +178,19 @@ export default {
 
 .positive {
   color: green;
-  animation: up 0.75s;
+  animation: up 1s;
 }
 @keyframes up {
-  50% {transform: translateY(5px);}
+  0% {transform: translateY(5px);}
+  100% {transform: translateY(0);}
 }
 
 .negative {
   color: red;
-  animation: down 0.75s;
+  animation: down 1s;
 }
 @keyframes down {
-  50% {transform: translateY(-5px);}
+  0% {transform: translateY(-5px);}
+  100% {transform: translateY(0);}
 }
 </style>
