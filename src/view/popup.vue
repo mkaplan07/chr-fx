@@ -1,6 +1,7 @@
 <template>
   <div id="popup">
     <!-- for testing only -->
+    <p>avKey: {{ avKey }}</p>
     <p>verified: {{ verified }}</p>
 
     <div v-if="!verified">
@@ -16,10 +17,11 @@
     <fx-data v-else-if="quote" :base="base" :quote="quote"></fx-data>
 
     <div v-else>
-      <p>Highlight a forex currency pair and try again.</p>
+      <p>Highlight an FX pair, get daily &#38; monthly charts</p>
+      <p>Supported pairs include x, y, and z</p>
     </div>
 
-    <!-- for testing only -->
+    <!-- for testing only ? -->
     <button type="button" @click="clearKey" style="margin-top: 10px;">Clear Key</button>
   </div>
 </template>

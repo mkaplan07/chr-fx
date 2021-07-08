@@ -1,7 +1,8 @@
 <template>
-  <!-- error & count for testing only -->
-  <p>error: {{ error }}</p>
+  <!-- for testing only -->
   <p>count: {{ count }}</p>
+  <p>error: {{ error }}</p>
+
   <div v-show="exchangeRate" id="priceInfo">
     <div id="exchangeRate">{{ exchangeRate }}</div>
 
@@ -29,7 +30,7 @@ export default {
       exchangeRate: '',
       current: '',
       count: 0,
-      error: false,
+      error: '',
       daily: {
         type: "line",
         data: {
@@ -101,7 +102,7 @@ export default {
   },
   methods: {
     getData(timeframe) {
-      fetch(`https://www.alphavantage.co/query?function=FX_${timeframe.toUpperCase()}&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
+      fetch(`https://www.alphavontage.co/query?function=FX_${timeframe.toUpperCase()}&from_symbol=${this.base}&to_symbol=${this.quote}&apikey=${this.avKey}`)
         .then(response => response.json())
         .then(data => {
           this[timeframe].data.datasets[0].data.length = 0;
@@ -110,49 +111,46 @@ export default {
             if (this[timeframe].data.datasets[0].data.length <= 10) {
               this[timeframe].data.datasets[0].data.unshift(Number(data[`Time Series FX (${timeframe.slice(0, 1).toUpperCase() + timeframe.slice(1)})`][k]["4. close"]));
               this[timeframe].data.labels.unshift(k);
-            } else if (timeframe === 'daily') {
-              this.exchangeRate = this.daily.data.datasets[0].data.slice(-1).shift();
             }
           }
         })
         .then(() => this.count += 1)
+        .catch((error) => {
+          this.error = error; // error: !response.ok... no exchangeRate, no charts
+        })
     },
     displayNext(timeframe) {
       this.current = timeframe;
     },
     createChart(id, dataset) {
-      // if (this.view) { this.view.destroy(); }
-
       let ctx = document.getElementById(id);
       new Chart(ctx, dataset);
     },
     prepCharts() {
+      if (!this.daily.data.datasets[0].data.length ||
+        !this.monthly.data.datasets[0].data.length) {
+        this.error = 'overlimit'; // error: overlimit... no exchangeRate, no charts
+      } else {
+        this.createChart('daily', this.daily);
+        this.createChart('monthly', this.monthly);
+        this.current = 'daily';
+        this.exchangeRate = this.daily.data.datasets[0].data.slice(-1).shift();
+      }
+    },
+    trafficCop() {
       if (this.count < 2) {
         setTimeout(() => {
-          this.prepCharts();
+          this.trafficCop();
         }, 500);
       } else {
-        // TODO: outsource to fn
-        if (this.daily.data.datasets[0].data.length) {
-          this.createChart('daily', this.daily);
-        } else {
-          this.error = true;
-        }
-
-        if (this.monthly.data.datasets[0].data.length) {
-          this.createChart('monthly', this.monthly);
-        } else {
-          this.error = true;
-        }
-
-        this.current = 'daily';
+        this.prepCharts();
       }
     },
     getChartData() {
       this.getData('daily');
       this.getData('monthly');
 
-      this.prepCharts();
+      this.trafficCop();
     }
   }
 }
@@ -166,6 +164,7 @@ export default {
 
   font-size: 16px;
 }
+
 #exchangeRate {
   font-size: 20px;
   margin-right: 1px;
