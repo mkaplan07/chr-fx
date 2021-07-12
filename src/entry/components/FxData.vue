@@ -1,6 +1,5 @@
 <template>
-  <!-- for testing only -->
-  <p>count: {{ count }}</p>
+  <p v-if="loading" id="loading">Loading chart info...</p>
 
   <div v-show="exchangeRate" id="priceInfo">
     <div id="exchangeRate">{{ exchangeRate }}</div>
@@ -93,6 +92,9 @@ export default {
     this.getChartData();
   },
   computed: {
+    loading() {
+      return this.count < 2;
+    },
     whichArrow() {
       let prev = this.daily.data.datasets[0].data.slice(-2).shift();
       return this.exchangeRate > prev;
@@ -153,6 +155,11 @@ export default {
 </script>
 
 <style scoped>
+#loading {
+  text-align: center;
+  margin: 50px;
+}
+
 #priceInfo {
   display: flex;
   justify-content: center;

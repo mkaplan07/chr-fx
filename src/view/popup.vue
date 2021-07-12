@@ -1,8 +1,9 @@
 <template>
   <div id="popup">
-    <!-- for testing only -->
-    <p>avKey: {{ avKey }}</p>
-    <p>verified: {{ verified }}</p>
+    <div class="keyInfo">
+      <span>verified: {{ verified }}</span>
+      <button type="button" @click="clearKey" style="margin-top: 10px;">Clear Key</button>
+    </div>
 
     <div v-if="!verified">
       <p>Data provided by Alpha Vantage</p>
@@ -30,8 +31,6 @@
       <p>Supported pairs include x, y, and z</p>
     </div>
 
-    <!-- for testing only ? -->
-    <button type="button" @click="clearKey" style="margin-top: 10px;">Clear Key</button>
   </div>
 </template>
 
@@ -108,7 +107,14 @@ export default {
 <style>
 #popup {
   width: 300px;
+  height: 245px;
+
   font-family: Helvetica;
+}
+.keyInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .acceptKey {
   outline: none;
