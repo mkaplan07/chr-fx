@@ -1,6 +1,11 @@
 <template>
-  <p v-if="loading" class="center">Loading chart info...</p>
-
+  <div v-if="!exchangeRate" class="center">
+    <p>Loading chart info</p>
+    <div id="progress-bar">
+      <div id="progress" :style="perc"></div>
+    </div>
+  </div>
+  <!-- this screams v-else-if -->
   <div v-show="exchangeRate" id="priceInfo">
     <div id="exchangeRate">{{ exchangeRate }}</div>
 
@@ -92,8 +97,8 @@ export default {
     this.getChartData();
   },
   computed: {
-    loading() {
-      return this.count < 2;
+    perc() {
+      return this.count < 1 ? { width: '0%' } : { width: (this.count / 2) * 100 + '%' };
     },
     whichArrow() {
       let prev = this.daily.data.datasets[0].data.slice(-2).shift();
@@ -155,6 +160,19 @@ export default {
 </script>
 
 <style scoped>
+#progress-bar {
+  width: 200px;
+  height: 10px;
+
+  border: 1px solid #c7c7c7;
+}
+
+#progress {
+  background-color: #c7c7c7;
+
+  height: 100%;
+}
+
 #priceInfo {
   display: flex;
   justify-content: center;
