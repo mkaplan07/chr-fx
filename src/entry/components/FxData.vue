@@ -5,18 +5,17 @@
       <div id="progress" :style="perc"></div>
     </div>
   </div>
-  <!-- this screams v-else-if -->
-  <div v-show="exchangeRate" id="priceInfo">
-    <div id="exchangeRate">{{ exchangeRate }}</div>
+  <div v-else>
+    <div id="priceInfo">
+      <p>{{ exchangeRate }}</p>
+      <span v-if="whichArrow" class="positive">&#8593;</span>
+      <span v-else class="negative">&#8595;</span>
+    </div>
 
-    <span v-if="whichArrow" class="positive">&#8593;</span>
-    <span v-else class="negative">&#8595;</span>
+    <p id="baseQuote">{{ base }}/{{ quote }} {{ currentCaps }}</p>
   </div>
 
-  <p v-show="current === 'daily'">{{ base }}/{{ quote }} Daily</p>
   <canvas v-show="current === 'daily'" id="daily" @click="displayNext('monthly')"></canvas>
-
-  <p v-show="current === 'monthly'">{{ base }}/{{ quote }} Monthly</p>
   <canvas v-show="current === 'monthly'" id="monthly" @click="displayNext('daily')"></canvas>
 
   <!-- <p>daily: {{ daily.data.datasets[0].data }}</p>
@@ -103,6 +102,9 @@ export default {
     whichArrow() {
       let prev = this.daily.data.datasets[0].data.slice(-2).shift();
       return this.exchangeRate > prev;
+    },
+    currentCaps() {
+      return this.current.slice(0, 1).toUpperCase() + this.current.slice(1);
     }
   },
   methods: {
@@ -177,11 +179,9 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-
-  font-size: 16px;
 }
 
-#exchangeRate {
+#priceInfo p {
   font-size: 20px;
   margin-right: 1px;
 
@@ -197,8 +197,8 @@ export default {
   animation: up 1s;
 }
 @keyframes up {
-  0% {transform: translateY(5px);}
-  100% {transform: translateY(0);}
+  0% {transform: translateY(10px);}
+  100% {transform: translateY(0px);}
 }
 
 .negative {
@@ -206,7 +206,12 @@ export default {
   animation: down 1s;
 }
 @keyframes down {
-  0% {transform: translateY(5px);}
-  100% {transform: translateY(0);}
+  0% {transform: translateY(-10px);}
+  100% {transform: translateY(0px);}
+}
+
+#baseQuote {
+  text-align: center;
+  margin: -10px 0 15px;
 }
 </style>

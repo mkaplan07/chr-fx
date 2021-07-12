@@ -2,7 +2,7 @@
   <div id="popup">
     <div id="keyInfo">
       <span>verified: {{ verified }}</span>
-      <button type="button" @click="clearKey" style="margin-top: 10px;">Clear Key</button>
+      <button type="button" @click="clearKey">Clear Key</button>
     </div>
 
     <div v-if="!verified" class="center">
@@ -107,7 +107,7 @@ export default {
 <style>
 #popup {
   width: 300px;
-  height: 245px;
+  height: 255px;
 
   font-family: Helvetica;
 }
