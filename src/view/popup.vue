@@ -14,7 +14,7 @@
       <button type="button" id="submit" @click="verifyKey">Submit</button>
     </div>
 
-    <fx-data v-else-if="quote" :base="base" :quote="quote"></fx-data>
+    <fx-data v-else-if="quote" :avKey="avKey" :base="base" :quote="quote"></fx-data>
 
     <div v-else>
       <p>Highlight an FX pair, get daily &#38; monthly charts</p>
