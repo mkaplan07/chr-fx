@@ -1,7 +1,6 @@
 <template>
   <!-- for testing only -->
   <p>count: {{ count }}</p>
-  <p>error: {{ error }}</p>
 
   <div v-show="exchangeRate" id="priceInfo">
     <div id="exchangeRate">{{ exchangeRate }}</div>
@@ -30,7 +29,6 @@ export default {
       exchangeRate: '',
       current: '',
       count: 0,
-      error: '',
       daily: {
         type: "line",
         data: {
@@ -115,9 +113,7 @@ export default {
           }
         })
         .then(() => this.count += 1)
-        .catch((error) => {
-          this.error = error; // error: !response.ok... no exchangeRate, no charts
-        })
+        .catch(() => this.$emit('error')); // error: !response.ok... no exchangeRate, no charts
     },
     displayNext(timeframe) {
       this.current = timeframe;
@@ -129,7 +125,7 @@ export default {
     prepCharts() {
       if (!this.daily.data.datasets[0].data.length ||
         !this.monthly.data.datasets[0].data.length) {
-        this.error = 'overlimit'; // error: overlimit... no exchangeRate, no charts
+        this.$emit('error'); // error: overlimit... no exchangeRate, no charts
       } else {
         this.createChart('daily', this.daily);
         this.createChart('monthly', this.monthly);
@@ -181,7 +177,7 @@ export default {
   animation: up 1s;
 }
 @keyframes up {
-  0% {transform: translateY(5px);}
+  0% {transform: translateY(10px);}
   100% {transform: translateY(0);}
 }
 
@@ -190,7 +186,7 @@ export default {
   animation: down 1s;
 }
 @keyframes down {
-  0% {transform: translateY(-5px);}
+  0% {transform: translateY(-10px);}
   100% {transform: translateY(0);}
 }
 </style>

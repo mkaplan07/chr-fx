@@ -14,7 +14,16 @@
       <button type="button" id="submit" @click="verifyKey">Submit</button>
     </div>
 
-    <fx-data v-else-if="quote" :avKey="avKey" :base="base" :quote="quote"></fx-data>
+    <err-cmp v-else-if="error"></err-cmp>
+
+    <fx-data
+      v-else-if="quote"
+      :avKey="avKey"
+      :base="base"
+      :quote="quote"
+      @error="setError"
+    >
+    </fx-data>
 
     <div v-else>
       <p>Highlight an FX pair, get daily &#38; monthly charts</p>
@@ -28,11 +37,13 @@
 
 <script>
 import FxData from '../entry/components/FxData.vue';
+import ErrCmp from '../entry/components/ErrCmp.vue';
 
 export default {
   name: 'popup',
   components: {
-    'fx-data': FxData
+    'fx-data': FxData,
+    'err-cmp': ErrCmp
   },
   data() {
     return {
@@ -42,7 +53,8 @@ export default {
       'GBP/USD', 'USDCHF', 'USD/CHF', 'USDCAD', 'USD/CAD',
       'AUDUSD', 'AUD/USD', 'NZDUSD', 'NZD/USD'],
       base: '',
-      quote: ''
+      quote: '',
+      error: false
     }
   },
   mounted() {
@@ -83,6 +95,11 @@ export default {
       } else {
         this.verified = false; // see computed, validate()
       }
+    },
+    setError() {
+      this.error = true;
+      this.base = '';
+      this.quote = '';
     }
   }
 }
