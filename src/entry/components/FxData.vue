@@ -1,5 +1,5 @@
 <template>
-  <p v-if="loading" id="loading">Loading chart info...</p>
+  <p v-if="loading" class="center">Loading chart info...</p>
 
   <div v-show="exchangeRate" id="priceInfo">
     <div id="exchangeRate">{{ exchangeRate }}</div>
@@ -155,11 +155,6 @@ export default {
 </script>
 
 <style scoped>
-#loading {
-  text-align: center;
-  margin: 50px;
-}
-
 #priceInfo {
   display: flex;
   justify-content: center;
@@ -184,7 +179,7 @@ export default {
   animation: up 1s;
 }
 @keyframes up {
-  0% {transform: translateY(10px);}
+  0% {transform: translateY(5px);}
   100% {transform: translateY(0);}
 }
 
@@ -193,7 +188,7 @@ export default {
   animation: down 1s;
 }
 @keyframes down {
-  0% {transform: translateY(-10px);}
+  0% {transform: translateY(5px);}
   100% {transform: translateY(0);}
 }
 </style>

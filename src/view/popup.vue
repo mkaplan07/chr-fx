@@ -1,11 +1,11 @@
 <template>
   <div id="popup">
-    <div class="keyInfo">
+    <div id="keyInfo">
       <span>verified: {{ verified }}</span>
       <button type="button" @click="clearKey" style="margin-top: 10px;">Clear Key</button>
     </div>
 
-    <div v-if="!verified">
+    <div v-if="!verified" class="center">
       <p>Data provided by Alpha Vantage</p>
       <p>Get your free API key
       <a href="https://www.alphavantage.co/support/#api-key" target="_blank">here</a>
@@ -26,7 +26,7 @@
     >
     </fx-data>
 
-    <div v-else>
+    <div v-else class="center">
       <p>Highlight an FX pair, get daily &#38; monthly charts</p>
       <p>Supported pairs include x, y, and z</p>
     </div>
@@ -111,10 +111,14 @@ export default {
 
   font-family: Helvetica;
 }
-.keyInfo {
+#keyInfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.center {
+  text-align: center;
+  margin: 50px;
 }
 .acceptKey {
   outline: none;
@@ -125,6 +129,6 @@ export default {
   border: 1px solid red;
 }
 #submit {
-  margin-left: 5px;
+  margin: 10px auto;
 }
 </style>

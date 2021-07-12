@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="center">
     <p>No charts?</p>
     <p>There’s a problem at Alpha Vantage or you’ve hit your limit.</p>
     <p>Wait a sec and try again.</p>
@@ -13,8 +13,4 @@ export default {
 </script>
 
 <style scoped>
-div {
-  text-align: center;
-  margin: 50px;
-}
 </style>
