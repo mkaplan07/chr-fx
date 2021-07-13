@@ -20,9 +20,6 @@
 
   <canvas v-show="current === 'daily'" id="daily" @click="displayNext('monthly')"></canvas>
   <canvas v-show="current === 'monthly'" id="monthly" @click="displayNext('daily')"></canvas>
-
-  <!-- <p>daily: {{ daily.data.datasets[0].data }}</p>
-  <p>monthly: {{ monthly.data.datasets[0].data }}</p> -->
 </template>
 
 <script>

@@ -1,10 +1,5 @@
 <template>
   <div id="popup">
-    <!-- <div id="keyInfo">
-      <span>verified: {{ verified }}</span>
-      <button type="button" @click="clearKey">Clear Key</button>
-    </div> -->
-
     <div v-if="!verified" class="center">
       <p>Data provided by Alpha Vantage</p>
       <p>
@@ -29,9 +24,12 @@
     >
     </fx-data>
 
-    <div v-else class="center">
-      <p>Highlight an FX pair, get daily &#38; monthly charts</p>
-      <p>Supported pairs include x, y, and z</p>
+    <div v-else id="intro">
+      <p><span id="highlight">Highlight</span> a major FX pair,</p>
+      <p>Get daily &#38; monthly charts</p>
+      <br>
+      <p>Supported pairs include</p>
+      <p>{{ getPairs }}</p>
     </div>
 
   </div>
@@ -53,7 +51,8 @@ export default {
       verified: null,
       pairs: ['EURUSD', 'EUR/USD', 'USDJPY', 'USD/JPY', 'GBPUSD',
       'GBP/USD', 'USDCHF', 'USD/CHF', 'USDCAD', 'USD/CAD',
-      'AUDUSD', 'AUD/USD', 'NZDUSD', 'NZD/USD'],
+      'AUDUSD', 'AUD/USD', 'NZDUSD', 'NZD/USD', 'EURGBP',
+      'EUR/GBP', 'EUR/JPY', 'EURJPY', 'EURCHF', 'EUR/CHF'], // https://www.dailyfx.com/major-currency-pairs
       base: '',
       quote: '',
       error: false
@@ -66,6 +65,10 @@ export default {
   computed: {
     validate() {
       return this.verified === false ? 'rejectKey' : 'acceptKey';
+    },
+    getPairs() {
+      let majors = this.pairs.filter(pair => pair.includes('/'));
+      return majors.slice(0, -1).join(', ') + ' & ' + majors.slice(-1);
     }
   },
   methods: {
@@ -113,15 +116,8 @@ export default {
   height: 255px;
 
   font-family: Helvetica;
+  color: #333;
 }
-
-/* #keyInfo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  height: 25px;
-} */
 
 button {
   border: none;
@@ -151,7 +147,7 @@ button:active {
 }
 
 a, a:visited {
-  color: green;
+  color: #333;
   text-decoration: none;
 }
 a:hover {
@@ -160,5 +156,39 @@ a:hover {
 
 #submit {
   margin: 12px auto;
+}
+
+#intro {
+  text-align: center;
+  font-size: 14px;
+
+  margin: 60px;
+}
+#intro p {
+  margin-bottom: -5px;
+}
+#highlight {
+  position: relative;
+}
+#highlight:after {
+  content: "";
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  z-index: -1;
+  left: 0;
+
+  background-color: #fff36d;
+  animation: highlighter 1s ease-in-out;
+}
+@keyframes highlighter {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
 }
 </style>
