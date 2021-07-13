@@ -7,8 +7,10 @@
 
     <div v-if="!verified" class="center">
       <p>Data provided by Alpha Vantage</p>
-      <p>Get your free API key
-      <a href="https://www.alphavantage.co/support/#api-key" target="_blank">here</a>
+      <p>
+        <a href="https://www.alphavantage.co/support/#api-key" target="_blank">
+          Get your free API key
+        </a>
       </p>
 
       <input type="text" :class="validate" v-model="avKey" placeholder="Enter your API key">
@@ -130,7 +132,7 @@ button:hover {
   background-color: #e4eff4;
 }
 button:active {
-  border: 1px solid #c7c7c7;
+  border: 1px solid #3b4859;
 }
 
 .center {
@@ -139,11 +141,20 @@ button:active {
 }
 .acceptKey {
   outline: none;
-  border: 1px solid #c7c7c7;
+  border: 1px solid #3b4859;
 }
 .rejectKey {
   outline: none;
   border: 1px solid red;
+}
+
+a, a:visited {
+  color: green;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 #submit {

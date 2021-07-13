@@ -39,9 +39,9 @@ export default {
           datasets: [
             {
               data: [],
-              backgroundColor: "rgba(54,73,93,.5)",
-              borderColor: "#36495d",
-              borderWidth: 3
+              backgroundColor: "#e4eff4",
+              borderColor: "#3b4859",
+              borderWidth: 1
             }
           ]
         },
@@ -58,6 +58,11 @@ export default {
           },
           tooltips: {
             displayColors: false
+          },
+          elements: {
+            point: {
+              radius: 2
+            }
           }
         }
       },
@@ -68,9 +73,9 @@ export default {
           datasets: [
             {
               data: [],
-              backgroundColor: "rgba(54,73,93,.5)",
-              borderColor: "#36495d",
-              borderWidth: 3
+              backgroundColor: "#e4eff4",
+              borderColor: "#3b4859",
+              borderWidth: 1
             }
           ]
         },
@@ -87,6 +92,11 @@ export default {
           },
           tooltips: {
             displayColors: false
+          },
+          elements: {
+            point: {
+              radius: 2
+            }
           }
         }
       }
@@ -166,11 +176,11 @@ export default {
   width: 200px;
   height: 10px;
 
-  border: 1px solid #c7c7c7;
+  border: 1px solid #3b4859;
 }
 
 #progress {
-  background-color: #c7c7c7;
+  background-color: #e4eff4;
 
   height: 100%;
 }
@@ -183,6 +193,8 @@ export default {
 
 #priceInfo p {
   font-size: 20px;
+  color: #3b4859;
+
   margin-right: 1px;
 
   animation: fadein 0.75s;
