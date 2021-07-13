@@ -1,9 +1,9 @@
 <template>
   <div id="popup">
-    <div id="keyInfo">
+    <!-- <div id="keyInfo">
       <span>verified: {{ verified }}</span>
       <button type="button" @click="clearKey">Clear Key</button>
-    </div>
+    </div> -->
 
     <div v-if="!verified" class="center">
       <p>Data provided by Alpha Vantage</p>
@@ -113,13 +113,14 @@ export default {
 
   font-family: Helvetica;
 }
-#keyInfo {
+
+/* #keyInfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  height: 25px; /* button */
-}
+  height: 25px;
+} */
 
 button {
   border: none;
@@ -152,7 +153,6 @@ a, a:visited {
   color: green;
   text-decoration: none;
 }
-
 a:hover {
   text-decoration: underline;
 }

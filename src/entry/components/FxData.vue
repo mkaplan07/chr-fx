@@ -6,13 +6,16 @@
     </div>
   </div>
   <div v-else>
+    <div id="top-bar">
+      <p>{{ base }}/{{ quote }} {{ currentCaps }}</p>
+      <button type="button" @click="clearKey">Clear Key</button>
+    </div>
+
     <div id="priceInfo">
       <p>{{ exchangeRate }}</p>
       <span v-if="whichArrow" class="positive">&#8593;</span>
       <span v-else class="negative">&#8595;</span>
     </div>
-
-    <p id="baseQuote">{{ base }}/{{ quote }} {{ currentCaps }}</p>
   </div>
 
   <canvas v-show="current === 'daily'" id="daily" @click="displayNext('monthly')"></canvas>
@@ -185,6 +188,19 @@ export default {
   height: 100%;
 }
 
+#top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  height: 25px; /* button */
+}
+
+/* #baseQuote {
+  text-align: center;
+  margin: -10px 0 15px;
+} */
+
 #priceInfo {
   display: flex;
   justify-content: center;
@@ -220,10 +236,5 @@ export default {
 @keyframes down {
   0% {transform: translateY(-10px);}
   100% {transform: translateY(0px);}
-}
-
-#baseQuote {
-  text-align: center;
-  margin: -10px 0 15px;
 }
 </style>
