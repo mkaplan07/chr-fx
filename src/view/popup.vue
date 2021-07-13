@@ -115,7 +115,24 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  height: 25px; /* button */
 }
+
+button {
+  border: none;
+  outline: none;
+  padding: 4px 8px;
+
+  transition: background-color 0.2s linear;
+}
+button:hover {
+  background-color: #e4eff4;
+}
+button:active {
+  border: 1px solid #c7c7c7;
+}
+
 .center {
   text-align: center;
   margin: 50px;
@@ -128,7 +145,8 @@ export default {
   outline: none;
   border: 1px solid red;
 }
+
 #submit {
-  margin: 10px auto;
+  margin: 12px auto;
 }
 </style>

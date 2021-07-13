@@ -26,7 +26,7 @@
 import Chart from 'chart.js';
 
 export default {
-  props: ['avKey', 'base', 'quote'],
+  props: ['avKey', 'base', 'quote'], // avKey, undefined ok
   data() {
     return {
       exchangeRate: '',
