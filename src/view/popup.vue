@@ -138,12 +138,14 @@ a:hover {
   text-decoration: underline;
 }
 
-.acceptKey {
+.center input {
   outline: none;
+  padding-left: 5px;
+}
+.acceptKey {
   border: 1px solid #3b4859;
 }
 .rejectKey {
-  outline: none;
   border: 1px solid red;
 }
 
