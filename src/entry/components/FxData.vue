@@ -176,9 +176,8 @@ export default {
   width: 200px;
   height: 10px;
 
-  border: 1px solid #3b4859;
+  border: 1px solid rgba(59, 72, 89, 0.1); /* #3b4859 */
 }
-
 #progress {
   height: 100%;
   background-color: #e4eff4;

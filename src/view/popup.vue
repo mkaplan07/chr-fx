@@ -8,7 +8,7 @@
         </a>
       </p>
 
-      <input type="text" :class="validate" v-model="avKey" placeholder="Enter your API key">
+      <input type="password" :class="validate" v-model="avKey" placeholder="Enter your API key">
       <button type="button" id="submit" @click="verifyKey">Submit</button>
     </div>
 
@@ -25,9 +25,8 @@
     <err-cmp v-else-if="error"></err-cmp>
 
     <div v-else id="intro">
-      <p><span id="highlight">Highlight</span> a major FX pair,</p>
-      <p>Get daily &#38; monthly charts</p>
-      <br>
+      <p><span id="highlight">Highlight</span> a major FX pair,
+      Get daily &#38; monthly charts</p>
       <p>Supported pairs include</p>
       <p>{{ getPairs }}</p>
     </div>
@@ -110,13 +109,42 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap');
+body {
+  margin: 0;
+}
+
 #popup {
   width: 300px;
   height: 255px;
 
   font-size: 13px;
-  font-family: Helvetica;
+  font-family: 'Roboto Slab', serif;
   color: #333;
+
+  padding: 8px; /* replace body margin */
+}
+
+.center {
+  text-align: center;
+  padding: 50px;
+}
+
+a, a:visited {
+  color: #333;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.acceptKey {
+  outline: none;
+  border: 1px solid #3b4859;
+}
+.rejectKey {
+  outline: none;
+  border: 1px solid red;
 }
 
 button {
@@ -133,38 +161,18 @@ button:active {
   border: 1px solid #3b4859;
 }
 
-.center {
-  text-align: center;
-  margin: 50px;
-}
-.acceptKey {
-  outline: none;
-  border: 1px solid #3b4859;
-}
-.rejectKey {
-  outline: none;
-  border: 1px solid red;
-}
-
-a, a:visited {
-  color: #333;
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}
-
 #submit {
   margin: 12px auto;
 }
 
 #intro {
   text-align: center;
-  margin: 60px;
+  padding: 20px 60px;
 }
-#intro p {
-  margin-bottom: -5px;
+#intro p:last-of-type {
+  margin-top: -5px;
 }
+
 #highlight {
   position: relative;
 }
