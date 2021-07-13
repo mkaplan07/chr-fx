@@ -24,6 +24,7 @@
       :avKey="avKey"
       :base="base"
       :quote="quote"
+      @clear="clearKey"
       @error="setError"
     >
     </fx-data>

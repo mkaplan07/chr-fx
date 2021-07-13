@@ -8,7 +8,7 @@
   <div v-else>
     <div id="top-bar">
       <p>{{ base }}/{{ quote }} {{ currentCaps }}</p>
-      <button type="button" @click="clearKey">Clear Key</button>
+      <button type="button" @click="$emit('clear')">Clear Key</button>
     </div>
 
     <div id="priceInfo">
@@ -29,7 +29,7 @@
 import Chart from 'chart.js';
 
 export default {
-  props: ['avKey', 'base', 'quote'], // avKey, undefined ok
+  props: ['avKey', 'base', 'quote'], // avKey, but undefined ok
   data() {
     return {
       exchangeRate: '',
@@ -183,9 +183,8 @@ export default {
 }
 
 #progress {
-  background-color: #e4eff4;
-
   height: 100%;
+  background-color: #e4eff4;
 }
 
 #top-bar {
@@ -196,17 +195,11 @@ export default {
   height: 25px; /* button */
 }
 
-/* #baseQuote {
-  text-align: center;
-  margin: -10px 0 15px;
-} */
-
 #priceInfo {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-
 #priceInfo p {
   font-size: 20px;
   color: #3b4859;
