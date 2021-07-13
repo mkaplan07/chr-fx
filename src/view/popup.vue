@@ -12,10 +12,8 @@
       <button type="button" id="submit" @click="verifyKey">Submit</button>
     </div>
 
-    <err-cmp v-else-if="error"></err-cmp>
-
     <fx-data
-      v-else-if="quote"
+      v-else-if="verified && quote"
       :avKey="avKey"
       :base="base"
       :quote="quote"
@@ -24,6 +22,8 @@
     >
     </fx-data>
 
+    <err-cmp v-else-if="error"></err-cmp>
+
     <div v-else id="intro">
       <p><span id="highlight">Highlight</span> a major FX pair,</p>
       <p>Get daily &#38; monthly charts</p>
@@ -31,7 +31,6 @@
       <p>Supported pairs include</p>
       <p>{{ getPairs }}</p>
     </div>
-
   </div>
 </template>
 
@@ -115,6 +114,7 @@ export default {
   width: 300px;
   height: 255px;
 
+  font-size: 13px;
   font-family: Helvetica;
   color: #333;
 }
@@ -160,8 +160,6 @@ a:hover {
 
 #intro {
   text-align: center;
-  font-size: 14px;
-
   margin: 60px;
 }
 #intro p {
