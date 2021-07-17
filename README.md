@@ -9,13 +9,14 @@ I wasn’t familiar with the file structure for Chrome extensions or vue-cli-plu
 
 * src/entry/content.js interacts with the webpage. It listens for mouseup events and adds highlighted text to Chrome storage.
 * When the extension is clicked, src/view/popup.vue pulls the highlighted text from storage and checks whether it matches one of the forex pairs in the pairs array.
-* If there is a match, popup.vue calls src/entry/components/FxData, a component that displays price data & charts.
+* If there is a match, popup.vue calls src/entry/components/FxData, a component that displays the price & charts.
 * If not, popup.vue shows the instructions, located here: `<div v-else id="intro">`
 
 ![price data and charts](/src/assets/chrfx.gif)
 
 ## The Alpha Vantage API
 Data provided by Alpha Vantage via their free API, which is limited to 5 calls/minute.
+
 Exceed the limit and popup.vue calls src/entry/components/ErrCmp, which displays an error message.
 
 ![rate limited](/src/assets/chr-err.gif)
