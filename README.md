@@ -8,11 +8,8 @@ Made with Vue, Chart.js, and [vue-cli-plugin-chrome-extension-cli](https://www.n
 I wasn’t familiar with the file structure for Chrome extensions or vue-cli-plugin-chrome-extension-cli, and it took a while to figure everything out. Here's how I set it up:
 
 1. src/entry/content.js interacts with the webpage. It listens for mouseup events and adds highlighted text to Chrome storage.
-
 1. When the extension is clicked, src/view/popup.vue pulls the highlighted text from storage and checks whether it matches one of the forex pairs in the pairs array.
-
   1. If there is a match, popup.vue calls src/entry/components/FxData, a component that displays price data & charts.
-
   1. If not, popup.vue shows the instructions, located here: `<div v-else id="intro">`
 
 ![price data and charts](/src/assets/chrfx.gif)
