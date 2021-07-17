@@ -1,6 +1,6 @@
 # chr-fx
 
-A Chrome extension that lets you highlight any major forex trading pair (EURUSD, EUR/USD, etc.) and get the current price plus daily & monthly charts.
+A Chrome extension that lets you highlight any major forex trading pair (EURUSD, EUR/USD, etc.) and get the current price plus daily & monthly charts
 
 Made with Vue, Chart.js, and [vue-cli-plugin-chrome-extension-cli](https://www.npmjs.com/package/vue-cli-plugin-chrome-extension-cli)
 
@@ -21,4 +21,4 @@ Exceed the limit and popup.vue calls src/entry/components/ErrCmp, which displays
 
 ![rate limited](/src/assets/chr-err.gif)
 
-ErrCmp is also triggered on failed requests.
+ErrCmp is also triggered by failed requests.
